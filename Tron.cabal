@@ -1,0 +1,40 @@
+name:                Tron
+version:             0.1.0.0
+-- synopsis:
+-- description:
+homepage:            https://github.com/githubuser/Tron#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Andrea Law, Stefan Lesser
+maintainer:          example@example.com
+copyright:           2017 Andrea Law, Stefan Lesser
+category:            Game
+build-type:          Simple
+cabal-version:       >=1.10
+extra-source-files:  README.md
+
+library
+  exposed-modules:     Tron
+  ghc-options:         -Wall -fwarn-tabs
+  build-depends:       base >= 4.7 && < 5
+                     , hspec
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+test-suite tests
+  ghc-options:         -Wall -fno-warn-orphans
+  type:                exitcode-stdio-1.0
+  main-is:             tests.hs
+  hs-source-dirs:      tests
+  build-depends:       base
+                     , Tron
+                     , QuickCheck
+                     , hspec
+  default-language:    Haskell2010
+
+executable Tron
+  hs-source-dirs:      src
+  main-is:             Main.hs
+  build-depends:       base >= 4.7 && < 5
+  default-language:    Haskell2010
+
