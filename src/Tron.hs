@@ -10,6 +10,9 @@ data Direction
 data Position = Position Int Int
   deriving (Show, Eq)
 
+data Player = Player Position Direction
+  deriving (Show, Eq)
+
 turnLeft :: Direction -> Direction
 turnLeft West = South
 turnLeft East = North
@@ -27,4 +30,7 @@ move West  (Position x y) = Position (x - 1)  y
 move East  (Position x y) = Position (x + 1)  y
 move North (Position x y) = Position  x      (y - 1)
 move South (Position x y) = Position  x      (y + 1)
+
+movePlayer :: Player -> Player
+movePlayer (Player pos d) = Player (move d pos) d
 

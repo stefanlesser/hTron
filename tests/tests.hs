@@ -54,3 +54,7 @@ main = hspec $ do
     it "moving south equals Position(x, y + 1)" $ do
       property $ (\p@(Position x y) -> move South p == Position x (y + 1))
 
+  describe "movePlayer" $ do
+    it "move player moves player in its direction" $ do
+      movePlayer (Player (Position 10 10) East) `shouldBe` Player (Position 11 10) East
+
