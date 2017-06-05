@@ -2,6 +2,16 @@ module Main where
 
 import Tron
 import Test.Hspec
+import Test.QuickCheck
+
+instance Arbitrary Position where
+  arbitrary = positionGen
+
+positionGen :: Gen Position
+positionGen = do
+  x <- arbitrary
+  y <- arbitrary
+  return (Position x y)
 
 main :: IO ()
 main = hspec $ do
@@ -30,3 +40,17 @@ main = hspec $ do
 
     it "going south turning right goes west" $ do
       turnRight South `shouldBe` West
+
+  describe "move" $ do
+    it "moving west equals Position(x - 1, y)" $ do
+      property $ (\(Position x y) -> move West (Position x y) == Position (x - 1) y)
+
+    it "moving east equals Position(x + 1, y)" $ do
+      property $ (\(Position x y) -> move East (Position x y) == Position (x + 1) y)
+
+    it "moving north equals Position(x, y - 1)" $ do
+      property $ (\(Position x y) -> move North (Position x y) == Position x (y - 1))
+
+    it "moving south equals Position(x, y + 1)" $ do
+      property $ (\(Position x y) -> move South (Position x y) == Position x (y + 1))
+
