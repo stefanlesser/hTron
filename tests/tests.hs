@@ -43,14 +43,14 @@ main = hspec $ do
 
   describe "move" $ do
     it "moving west equals Position(x - 1, y)" $ do
-      property $ (\(Position x y) -> move West (Position x y) == Position (x - 1) y)
+      property $ (\p@(Position x y) -> move West p == Position (x - 1) y)
 
     it "moving east equals Position(x + 1, y)" $ do
-      property $ (\(Position x y) -> move East (Position x y) == Position (x + 1) y)
+      property $ (\p@(Position x y) -> move East p == Position (x + 1) y)
 
     it "moving north equals Position(x, y - 1)" $ do
-      property $ (\(Position x y) -> move North (Position x y) == Position x (y - 1))
+      property $ (\p@(Position x y) -> move North p == Position x (y - 1))
 
     it "moving south equals Position(x, y + 1)" $ do
-      property $ (\(Position x y) -> move South (Position x y) == Position x (y + 1))
+      property $ (\p@(Position x y) -> move South p == Position x (y + 1))
 
