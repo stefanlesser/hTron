@@ -34,3 +34,9 @@ move South (Position x y) = Position  x      (y + 1)
 movePlayer :: Player -> Player
 movePlayer (Player pos d) = Player (move d pos) d
 
+turnPlayerLeft :: Player -> Player
+turnPlayerLeft (Player pos d) = Player pos (turnLeft d)
+
+turnPlayerRight :: Player -> Player
+turnPlayerRight (Player pos d) = Player pos (turnRight d)
+

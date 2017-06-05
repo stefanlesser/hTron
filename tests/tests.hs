@@ -57,4 +57,13 @@ main = hspec $ do
   describe "movePlayer" $ do
     it "move player moves player in its direction" $ do
       movePlayer (Player (Position 10 10) East) `shouldBe` Player (Position 11 10) East
+    -- HELP: Is there a good way to test player movement with randomized QuickCheck?
+
+  describe "turnPlayer" $ do
+    it "turn player left changes player's direction" $ do
+      turnPlayerLeft (Player (Position 10 10) South) `shouldBe` Player (Position 10 10) East
+
+    it "turn player right changes player's direction" $ do
+      turnPlayerRight (Player (Position 10 10) South) `shouldBe` Player (Position 10 10) West
+    -- HELP: Is there a good way to test player changing direction with randomized QuickCheck?
 
