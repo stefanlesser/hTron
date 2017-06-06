@@ -5,89 +5,96 @@ import Test.Hspec
 import Test.QuickCheck
 
 instance Arbitrary Position where
-  arbitrary = positionGen
+  arbitrary = positionGen where
+    positionGen = do
+      x <- arbitrary
+      y <- arbitrary
+      return (Position x y)
 
-positionGen :: Gen Position
-positionGen = do
-  x <- arbitrary
-  y <- arbitrary
-  return (Position x y)
+instance Arbitrary Direction where
+  arbitrary = directionGen where
+    directionGen = do
+      oneof 
+        [ return West
+        , return East
+        , return North
+        , return South
+        ]
 
 main :: IO ()
 main = hspec $ do
   describe "turnLeft" $ do
-    it "going west turning left goes south" $
+    it "turns south if headed west" $
       turnLeft West `shouldBe` South
 
-    it "going east turning left goes north" $
+    it "turns north if headed east" $
       turnLeft East `shouldBe` North
 
-    it "going north turning left goes west" $
+    it "turns west if headed north" $
       turnLeft North `shouldBe` West
 
-    it "going south turning left goes east" $
+    it "turns east if headed south" $
       turnLeft South `shouldBe` East
 
   describe "turnRight" $ do
-    it "going west turning right goes north" $
+    it "turns north if headed west" $
       turnRight West `shouldBe` North
 
-    it "going east turning right goes south" $
+    it "turns south if headed east" $
       turnRight East `shouldBe` South
 
-    it "going north turning right goes east" $
+    it "turns east if headed north" $
       turnRight North `shouldBe` East
 
-    it "going south turning right goes west" $
+    it "turns west if headed south" $
       turnRight South `shouldBe` West
 
   describe "move" $ do
-    it "moving west equals Position(x - 1, y)" $
+    it "decreases x by 1 and doesn't change y" $
       property (\p@(Position x y) -> move West p == Position (x - 1) y)
 
-    it "moving east equals Position(x + 1, y)" $
+    it "increases x by 1 and doesn't change y" $
       property (\p@(Position x y) -> move East p == Position (x + 1) y)
 
-    it "moving north equals Position(x, y - 1)" $
+    it "doesn't change x and decreases y by 1" $
       property (\p@(Position x y) -> move North p == Position x (y - 1))
 
-    it "moving south equals Position(x, y + 1)" $
+    it "doesn't change x and increases y by 1" $
       property (\p@(Position x y) -> move South p == Position x (y + 1))
 
   describe "movePlayer" $ do
-    it "move player moves player in its direction" $
-      movePlayer (Player 1 (Position 10 10) East) `shouldBe` Player 1 (Position 11 10) East
-    -- HELP: Is there a good way to test player movement with randomized QuickCheck?
+    it "moves player in its direction" $ do
+      property (\pos dir -> movePlayer (Player 1 pos dir) == Player 1 (move dir pos) dir)
 
   describe "turnPlayer" $ do
-    it "turn player left changes player's direction" $
+    it "turns player counter-clockwise" $
       turnPlayerLeft (Player 1 (Position 10 10) South) `shouldBe` Player 1 (Position 10 10) East
 
-    it "turn player right changes player's direction" $
+    it "turns player clockwise" $
       turnPlayerRight (Player 1 (Position 10 10) South) `shouldBe` Player 1 (Position 10 10) West
     -- HELP: Is there a good way to test player changing direction with randomized QuickCheck?
 
   describe "applyAction" $ do
-    it "does not change the player if the action is not for the player" $
+    it "doesn't affect player if player ids don't match" $
       let player = (Player 2 (Position 20 20) West) in
       applyAction (TurnLeft 1) player `shouldBe` player
 
-    it "changes the player if the action is for the player" $
+    it "changes player's direction if player ids match" $
       let player = (Player 1 (Position 20 20) West) in
       applyAction (TurnLeft 1) player `shouldBe` Player 1 (Position 20 20) South
 
-
   describe "tick" $ do
-    it "tick generates the next state" $
+    it "generates next state without any actions" $
       let players = [Player 1 (Position 10 10) East, Player 2 (Position 20 20) West] 
           actions = [] in
         (tick players actions) `shouldBe`
           [Player 1 (Position 11 10) East, Player 2 (Position 19 20) West]
 
-    it "tick runs actions to generate next state" $
+    it "applies actions and generates next state" $
       let 
         players = [Player 1 (Position 10 10) East, Player 2 (Position 20 20) West] 
         actions = [TurnLeft 1, TurnRight 2] 
       in
         (tick players actions) `shouldBe`
           [Player 1 (Position 10 9) North, Player 2 (Position 20 19) North]
+
