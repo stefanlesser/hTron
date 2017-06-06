@@ -10,7 +10,12 @@ data Direction
 data Position = Position Int Int
   deriving (Show, Eq)
 
-data Player = Player Position Direction
+data Player = Player Int Position Direction
+  deriving (Show, Eq)
+
+data Action
+  = TurnLeft Int
+  | TurnRight Int
   deriving (Show, Eq)
 
 turnLeft :: Direction -> Direction
@@ -32,11 +37,19 @@ move North (Position x y) = Position  x      (y - 1)
 move South (Position x y) = Position  x      (y + 1)
 
 movePlayer :: Player -> Player
-movePlayer (Player pos d) = Player (move d pos) d
+movePlayer (Player pid pos d) = Player pid (move d pos) d
 
 turnPlayerLeft :: Player -> Player
-turnPlayerLeft (Player pos d) = Player pos (turnLeft d)
+turnPlayerLeft (Player pid pos d) = Player pid pos (turnLeft d)
 
 turnPlayerRight :: Player -> Player
-turnPlayerRight (Player pos d) = Player pos (turnRight d)
+turnPlayerRight (Player pid pos d) = Player pid pos (turnRight d)
 
+tick :: [Player] -> [Action] -> [Player]
+tick players actions = map movePlayer $ map applyActionsToPlayer players
+  where
+    applyActionsToPlayer p = foldr (\action acc -> applyAction action acc) p actions 
+
+applyAction :: Action -> Player -> Player
+applyAction (TurnLeft actionPid) p@(Player pid _ _) = if (actionPid == pid) then turnPlayerLeft p else p
+applyAction (TurnRight actionPid) p@(Player pid _ _) = if (actionPid == pid) then turnPlayerRight p else p

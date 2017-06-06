@@ -56,14 +56,38 @@ main = hspec $ do
 
   describe "movePlayer" $ do
     it "move player moves player in its direction" $
-      movePlayer (Player (Position 10 10) East) `shouldBe` Player (Position 11 10) East
+      movePlayer (Player 1 (Position 10 10) East) `shouldBe` Player 1 (Position 11 10) East
     -- HELP: Is there a good way to test player movement with randomized QuickCheck?
 
   describe "turnPlayer" $ do
     it "turn player left changes player's direction" $
-      turnPlayerLeft (Player (Position 10 10) South) `shouldBe` Player (Position 10 10) East
+      turnPlayerLeft (Player 1 (Position 10 10) South) `shouldBe` Player 1 (Position 10 10) East
 
     it "turn player right changes player's direction" $
-      turnPlayerRight (Player (Position 10 10) South) `shouldBe` Player (Position 10 10) West
+      turnPlayerRight (Player 1 (Position 10 10) South) `shouldBe` Player 1 (Position 10 10) West
     -- HELP: Is there a good way to test player changing direction with randomized QuickCheck?
 
+  describe "applyAction" $ do
+    it "does not change the player if the action is not for the player" $
+      let player = (Player 2 (Position 20 20) West) in
+      applyAction (TurnLeft 1) player `shouldBe` player
+
+    it "changes the player if the action is for the player" $
+      let player = (Player 1 (Position 20 20) West) in
+      applyAction (TurnLeft 1) player `shouldBe` Player 1 (Position 20 20) South
+
+
+  describe "tick" $ do
+    it "tick generates the next state" $
+      let players = [Player 1 (Position 10 10) East, Player 2 (Position 20 20) West] 
+          actions = [] in
+        (tick players actions) `shouldBe`
+          [Player 1 (Position 11 10) East, Player 2 (Position 19 20) West]
+
+    it "tick runs actions to generate next state" $
+      let 
+        players = [Player 1 (Position 10 10) East, Player 2 (Position 20 20) West] 
+        actions = [TurnLeft 1, TurnRight 2] 
+      in
+        (tick players actions) `shouldBe`
+          [Player 1 (Position 10 9) North, Player 2 (Position 20 19) North]
