@@ -3,21 +3,13 @@ module Main where
 import Tron
 import System.Console.ANSI
 import System.IO
+import System.Timeout
 
 drawPixel :: Int -> Int -> IO ()
 drawPixel x y = do
   setCursorPosition y x
   setSGR [SetColor Background Vivid White]
   putStr " "
-
-getInput :: IO (Char)
-getInput = do
-  char <- getChar
-  return char
-
-nextState :: Position -> IO ()
-nextState pos@(Position x y) = do
-  gameLoop pos
 
 -- game loop
 gameLoop :: Position -> IO ()
@@ -26,14 +18,15 @@ gameLoop pos@(Position x y) = do
   drawPixel x y
 
   -- process input character
-  input <- getInput
+  input <- timeout 100000 getChar
   case input of
-    'q' -> handleExit
-    'w' -> nextState (Position x (y - 1))
-    'a' -> nextState (Position (x - 1) y)
-    's' -> nextState (Position x (y + 1))
-    'd' -> nextState (Position (x + 1) y)
-    _   -> nextState pos
+    Just 'q' -> handleExit
+    Just 'w' -> gameLoop (Position x (y - 1))
+    Just 'a' -> gameLoop (Position (x - 1) y)
+    Just 's' -> gameLoop (Position x (y + 1))
+    Just 'd' -> gameLoop (Position (x + 1) y)
+    Just _   -> gameLoop pos
+    Nothing  -> gameLoop (Position x (y + 1))
 
 -- handle exit
 handleExit :: IO ()
