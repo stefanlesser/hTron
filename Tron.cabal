@@ -35,6 +35,8 @@ test-suite tests
 executable Tron
   hs-source-dirs:      src
   main-is:             Main.hs
+  other-modules:       Tron
   build-depends:       base >= 4.7 && < 5
+                     , ansi-terminal
   default-language:    Haskell2010
 
