@@ -63,6 +63,7 @@ applyActionToWorld action (World players) = World $ map (\player -> applyAction 
 applyActionsToWorld :: [Action] -> World -> World
 applyActionsToWorld actions world = foldr (\action world -> applyActionToWorld action world) world actions
 
-tick :: World -> [Action] -> World
-tick world@(World players) actions = nextWorldState $ applyActionsToWorld actions world
+-- game logic combined
+tick :: [Action] -> World -> World
+tick actions = nextWorldState . applyActionsToWorld actions
 

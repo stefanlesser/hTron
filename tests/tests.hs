@@ -104,10 +104,10 @@ main = hspec $ do
     it "generates next state without any actions" $
       let world = World [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ] 
           actions = [] in
-        tick world actions `shouldBe` World [ Player 1 (Position 11 10) East, Player 2 (Position 19 20) West ]
+        tick actions world `shouldBe` World [ Player 1 (Position 11 10) East, Player 2 (Position 19 20) West ]
 
     it "applies actions and generates next state" $
       let world = World [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ]
           actions = [TurnLeft 1, TurnRight 2] in
-        tick world actions `shouldBe` World [ Player 1 (Position 10 9) North, Player 2 (Position 20 19) North ]
+        tick actions world `shouldBe` World [ Player 1 (Position 10 9) North, Player 2 (Position 20 19) North ]
 
