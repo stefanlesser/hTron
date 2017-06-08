@@ -74,6 +74,23 @@ main = hspec $ do
       turnPlayerRight (Player 1 (Position 10 10) South) `shouldBe` Player 1 (Position 10 10) West
     -- HELP: Is there a good way to test player changing direction with randomized QuickCheck?
 
+  describe "nextWorldState" $ do
+    it "moves both players in their directions" $ do
+      let world = World [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ] in
+        nextWorldState world `shouldBe` World [ Player 1 (Position 11 10) East, Player 2 (Position 19 20) West ]
+
+  describe "applyActionToWorld" $ do
+    it "changes direction of player 1" $ do
+      let world = World [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ]
+          action = TurnLeft 1 in
+        applyActionToWorld action world `shouldBe` World [ Player 1 (Position 10 10) North, Player 2 (Position 20 20) West ] 
+
+  describe "applyActionsToWorld" $ do
+    it "changes directions of two players" $ do
+      let world = World [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ]
+          actions = [ TurnLeft 1, TurnRight 2 ] in
+        applyActionsToWorld actions world `shouldBe` World [ Player 1 (Position 10 10) North, Player 2 (Position 20 20) North ] 
+
   describe "applyAction" $ do
     it "doesn't affect player if player ids don't match" $
       let player = (Player 2 (Position 20 20) West) in
@@ -85,16 +102,12 @@ main = hspec $ do
 
   describe "tick" $ do
     it "generates next state without any actions" $
-      let players = [Player 1 (Position 10 10) East, Player 2 (Position 20 20) West] 
+      let world = World [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ] 
           actions = [] in
-        (tick players actions) `shouldBe`
-          [Player 1 (Position 11 10) East, Player 2 (Position 19 20) West]
+        tick world actions `shouldBe` World [ Player 1 (Position 11 10) East, Player 2 (Position 19 20) West ]
 
     it "applies actions and generates next state" $
-      let 
-        players = [Player 1 (Position 10 10) East, Player 2 (Position 20 20) West] 
-        actions = [TurnLeft 1, TurnRight 2] 
-      in
-        (tick players actions) `shouldBe`
-          [Player 1 (Position 10 9) North, Player 2 (Position 20 19) North]
+      let world = World [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ]
+          actions = [TurnLeft 1, TurnRight 2] in
+        tick world actions `shouldBe` World [ Player 1 (Position 10 9) North, Player 2 (Position 20 19) North ]
 
