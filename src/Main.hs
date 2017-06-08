@@ -26,6 +26,15 @@ gameLoop player@(Player pid (Position x y) direction) = do
     Just _   -> gameLoop $ movePlayer player
     Nothing  -> gameLoop $ movePlayer player
 
+-- set up terminal / screen
+handleStartup :: IO ()
+handleStartup = do
+  hSetEcho      stdin  False
+  hSetBuffering stdin  NoBuffering
+  hSetBuffering stdout NoBuffering
+  hideCursor
+  setTitle "hTron"
+
 -- handle exit
 handleExit :: IO ()
 handleExit = do
@@ -38,14 +47,7 @@ handleExit = do
 -- main function
 main :: IO ()
 main = do
-  -- set up terminal
-  hSetEcho      stdin  False
-  hSetBuffering stdin  NoBuffering
-  hSetBuffering stdout NoBuffering
-  hideCursor
-  setTitle "hTron"
-
-  -- clear screen and launch into game loop
+  handleStartup
   clearScreen
   gameLoop $ Player 1 (Position 10 10) East
 
