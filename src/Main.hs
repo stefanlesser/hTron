@@ -12,8 +12,8 @@ drawPixel x y = do
   putStr " "
 
 -- game loop
-gameLoop :: Position -> IO ()
-gameLoop pos@(Position x y) = do
+gameLoop :: Player -> IO ()
+gameLoop player@(Player pid (Position x y) direction) = do
   -- some test output
   drawPixel x y
 
@@ -21,12 +21,10 @@ gameLoop pos@(Position x y) = do
   input <- timeout 100000 getChar
   case input of
     Just 'q' -> handleExit
-    Just 'w' -> gameLoop (Position x (y - 1))
-    Just 'a' -> gameLoop (Position (x - 1) y)
-    Just 's' -> gameLoop (Position x (y + 1))
-    Just 'd' -> gameLoop (Position (x + 1) y)
-    Just _   -> gameLoop pos
-    Nothing  -> gameLoop (Position x (y + 1))
+    Just 'z' -> gameLoop $ movePlayer $ turnPlayerLeft player 
+    Just 'x' -> gameLoop $ movePlayer $ turnPlayerRight player
+    Just _   -> gameLoop $ movePlayer player
+    Nothing  -> gameLoop $ movePlayer player
 
 -- handle exit
 handleExit :: IO ()
@@ -49,5 +47,5 @@ main = do
 
   -- clear screen and launch into game loop
   clearScreen
-  gameLoop (Position 10 10)
+  gameLoop $ Player 1 (Position 10 10) East
 
