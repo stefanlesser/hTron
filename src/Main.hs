@@ -21,8 +21,8 @@ gameLoop player@(Player pid (Position x y) direction) = do
   input <- timeout 100000 getChar
   case input of
     Just 'q' -> handleExit
-    Just 'z' -> gameLoop $ movePlayer $ turnPlayerLeft player 
-    Just 'x' -> gameLoop $ movePlayer $ turnPlayerRight player
+    Just 'z' -> gameLoop $ movePlayer $ turnPlayer LeftTurn player 
+    Just 'x' -> gameLoop $ movePlayer $ turnPlayer RightTurn player
     Just _   -> gameLoop $ movePlayer player
     Nothing  -> gameLoop $ movePlayer player
 

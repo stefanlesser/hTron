@@ -23,31 +23,31 @@ instance Arbitrary Direction where
 
 main :: IO ()
 main = hspec $ do
-  describe "turnLeft" $ do
+  describe "turn LeftTurn" $ do
     it "turns south if headed west" $
-      turnLeft West `shouldBe` South
+      turn LeftTurn West `shouldBe` South
 
     it "turns north if headed east" $
-      turnLeft East `shouldBe` North
+      turn LeftTurn East `shouldBe` North
 
     it "turns west if headed north" $
-      turnLeft North `shouldBe` West
+      turn LeftTurn North `shouldBe` West
 
     it "turns east if headed south" $
-      turnLeft South `shouldBe` East
+      turn LeftTurn South `shouldBe` East
 
-  describe "turnRight" $ do
+  describe "turn RightTurn" $ do
     it "turns north if headed west" $
-      turnRight West `shouldBe` North
+      turn RightTurn West `shouldBe` North
 
     it "turns south if headed east" $
-      turnRight East `shouldBe` South
+      turn RightTurn East `shouldBe` South
 
     it "turns east if headed north" $
-      turnRight North `shouldBe` East
+      turn RightTurn North `shouldBe` East
 
     it "turns west if headed south" $
-      turnRight South `shouldBe` West
+      turn RightTurn South `shouldBe` West
 
   describe "move" $ do
     it "decreases x by 1 and doesn't change y" $
@@ -68,10 +68,10 @@ main = hspec $ do
 
   describe "turnPlayer" $ do
     it "turns player counter-clockwise" $
-      turnPlayerLeft (Player 1 (Position 10 10) South) `shouldBe` Player 1 (Position 10 10) East
+      turnPlayer LeftTurn (Player 1 (Position 10 10) South) `shouldBe` Player 1 (Position 10 10) East
 
     it "turns player clockwise" $
-      turnPlayerRight (Player 1 (Position 10 10) South) `shouldBe` Player 1 (Position 10 10) West
+      turnPlayer RightTurn (Player 1 (Position 10 10) South) `shouldBe` Player 1 (Position 10 10) West
     -- HELP: Is there a good way to test player changing direction with randomized QuickCheck?
 
   describe "nextWorldState" $ do

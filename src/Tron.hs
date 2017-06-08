@@ -7,6 +7,11 @@ data Direction
   | East
   deriving (Show, Eq)
 
+data Turn
+  = LeftTurn
+  | RightTurn
+  deriving (Show, Eq)
+
 data Position = Position Int Int
   deriving (Show, Eq)
 
@@ -21,17 +26,15 @@ data Action
   | TurnRight Int
   deriving (Show, Eq)
 
-turnLeft :: Direction -> Direction
-turnLeft West = South
-turnLeft East = North
-turnLeft North = West
-turnLeft South = East
-
-turnRight :: Direction -> Direction
-turnRight West = North
-turnRight East = South
-turnRight North = East
-turnRight South = West 
+turn :: Turn -> Direction -> Direction
+turn LeftTurn  West  = South
+turn LeftTurn  East  = North
+turn LeftTurn  North = West
+turn LeftTurn  South = East
+turn RightTurn West  = North
+turn RightTurn East  = South
+turn RightTurn North = East
+turn RightTurn South = West
 
 -- moving
 move :: Direction -> Position -> Position
@@ -47,15 +50,13 @@ nextWorldState :: World -> World
 nextWorldState (World players) = World $ map movePlayer players
 
 -- changing direction
-turnPlayerLeft :: Player -> Player
-turnPlayerLeft (Player pid pos d) = Player pid pos (turnLeft d)
-
-turnPlayerRight :: Player -> Player
-turnPlayerRight (Player pid pos d) = Player pid pos (turnRight d)
+turnPlayer :: Turn -> Player -> Player
+turnPlayer LeftTurn  (Player pid pos d) = Player pid pos (turn LeftTurn d)
+turnPlayer RightTurn (Player pid pos d) = Player pid pos (turn RightTurn d)
 
 applyAction :: Action -> Player -> Player
-applyAction (TurnLeft actionPid) p@(Player pid _ _) = if (actionPid == pid) then turnPlayerLeft p else p
-applyAction (TurnRight actionPid) p@(Player pid _ _) = if (actionPid == pid) then turnPlayerRight p else p
+applyAction (TurnLeft actionPid) p@(Player pid _ _) = if (actionPid == pid) then turnPlayer LeftTurn p else p
+applyAction (TurnRight actionPid) p@(Player pid _ _) = if (actionPid == pid) then turnPlayer RightTurn p else p
 
 applyActionToWorld :: Action -> World -> World
 applyActionToWorld action (World players) = World $ map (\player -> applyAction action player) players
