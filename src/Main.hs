@@ -11,6 +11,12 @@ drawPixel x y = do
   setSGR [SetColor Background Vivid White]
   putStr " "
 
+drawStep :: Step -> IO ()
+drawStep (Step players) = mapM_ drawPlayer players 
+  where 
+    drawPlayer :: Player -> IO ()
+    drawPlayer (Player _ (Position x y) _) = drawPixel x y
+
 -- game loop
 gameLoop :: Player -> IO ()
 gameLoop player@(Player pid (Position x y) direction) = do
@@ -21,8 +27,8 @@ gameLoop player@(Player pid (Position x y) direction) = do
   input <- timeout 100000 getChar
   case input of
     Just 'q' -> handleExit
-    Just 'z' -> gameLoop $ movePlayer $ turnPlayer LeftTurn player 
-    Just 'x' -> gameLoop $ movePlayer $ turnPlayer RightTurn player
+    Just 'z' -> gameLoop $ movePlayer $ applyAction (TurnLeft  1) player
+    Just 'x' -> gameLoop $ movePlayer $ applyAction (TurnRight 1) player
     Just _   -> gameLoop $ movePlayer player
     Nothing  -> gameLoop $ movePlayer player
 
