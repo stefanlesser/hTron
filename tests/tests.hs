@@ -82,23 +82,23 @@ main = hspec $ do
   describe "applyActionToStep" $ do
     it "changes direction of player 1" $ do
       let step = Step [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ]
-          action = TurnLeft 1 in
+          action = Action LeftTurn 1 in
         applyActionToStep action step `shouldBe` Step [ Player 1 (Position 10 10) North, Player 2 (Position 20 20) West ] 
 
   describe "applyActionsToStep" $ do
     it "changes directions of two players" $ do
       let step = Step [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ]
-          actions = [ TurnLeft 1, TurnRight 2 ] in
+          actions = [ Action LeftTurn 1, Action RightTurn 2 ] in
         applyActionsToStep actions step `shouldBe` Step [ Player 1 (Position 10 10) North, Player 2 (Position 20 20) North ] 
 
   describe "applyAction" $ do
     it "doesn't affect player if player ids don't match" $
       let player = Player 2 (Position 20 20) West in
-      applyAction (TurnLeft 1) player `shouldBe` player
+      applyAction (Action LeftTurn 1) player `shouldBe` player
 
     it "changes player's direction if player ids match" $
       let player = Player 1 (Position 20 20) West in
-      applyAction (TurnLeft 1) player `shouldBe` Player 1 (Position 20 20) South
+      applyAction (Action LeftTurn 1) player `shouldBe` Player 1 (Position 20 20) South
 
   describe "tickStep" $ do
     it "generates next state without any actions" $
@@ -108,7 +108,7 @@ main = hspec $ do
 
     it "applies actions and generates next state" $
       let step = Step [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ]
-          actions = [TurnLeft 1, TurnRight 2] in
+          actions = [Action LeftTurn 1, Action RightTurn 2] in
         tickStep actions step `shouldBe` Step [ Player 1 (Position 10 9) North, Player 2 (Position 20 19) North ]
 
   describe "tickWorld" $ do
@@ -118,7 +118,7 @@ main = hspec $ do
                                             , Step [ Player 1 (Position 10 11) South, Player 2 (Position 20 19) North ] ] 
 
     it "accumulates steps for second round with actions" $
-      let actions = [ TurnLeft 2 ]
+      let actions = [ Action LeftTurn 2 ]
           world = World [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ] ] in
         tickWorld actions world `shouldBe` World [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ]
                                                  , Step [ Player 1 (Position 10 11) South, Player 2 (Position 19 20) West ] ] 

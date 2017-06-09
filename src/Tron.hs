@@ -24,9 +24,7 @@ newtype Step = Step [Player]
 newtype World = World [Step]
   deriving (Show, Eq)
 
-data Action
-  = TurnLeft Int
-  | TurnRight Int
+data Action = Action Turn Int
   deriving (Show, Eq)
 
 turn :: Turn -> Direction -> Direction
@@ -58,8 +56,7 @@ turnPlayer LeftTurn  (Player pid pos d) = Player pid pos (turn LeftTurn d)
 turnPlayer RightTurn (Player pid pos d) = Player pid pos (turn RightTurn d)
 
 applyAction :: Action -> Player -> Player
-applyAction (TurnLeft  actionPid) p@(Player pid _ _) = if actionPid == pid then turnPlayer LeftTurn  p else p
-applyAction (TurnRight actionPid) p@(Player pid _ _) = if actionPid == pid then turnPlayer RightTurn p else p
+applyAction (Action turnDirection actionPid) p@(Player pid _ _) = if actionPid == pid then turnPlayer turnDirection p else p
 
 applyActionToStep :: Action -> Step -> Step
 applyActionToStep action (Step players) = Step $ map (applyAction action) players
@@ -72,4 +69,5 @@ tickStep :: [Action] -> Step -> Step
 tickStep actions = nextStep . applyActionsToStep actions
 
 tickWorld :: [Action] -> World -> World
-tickWorld actions (World steps) = World $ steps ++ [ (tickStep actions $ last steps) ]
+tickWorld actions (World steps) = World $ steps ++ [ tickStep actions $ last steps ]
+
