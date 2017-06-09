@@ -65,9 +65,11 @@ applyActionToStep :: Action -> Step -> Step
 applyActionToStep action (Step players) = Step $ map (applyAction action) players
 
 applyActionsToStep :: [Action] -> Step -> Step
-applyActionsToStep actions world = foldr applyActionToStep world actions
+applyActionsToStep actions step = foldr applyActionToStep step actions
 
 -- game logic combined
-tick :: [Action] -> Step -> Step
-tick actions = nextStep . applyActionsToStep actions
+tickStep :: [Action] -> Step -> Step
+tickStep actions = nextStep . applyActionsToStep actions
 
+tickWorld :: [Action] -> World -> World
+tickWorld actions (World steps) = World $ steps ++ [ (tickStep actions $ last steps) ]

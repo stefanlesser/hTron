@@ -100,14 +100,25 @@ main = hspec $ do
       let player = Player 1 (Position 20 20) West in
       applyAction (TurnLeft 1) player `shouldBe` Player 1 (Position 20 20) South
 
-  describe "tick" $ do
+  describe "tickStep" $ do
     it "generates next state without any actions" $
       let step = Step [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ] 
           actions = [] in
-        tick actions step `shouldBe` Step [ Player 1 (Position 11 10) East, Player 2 (Position 19 20) West ]
+        tickStep actions step `shouldBe` Step [ Player 1 (Position 11 10) East, Player 2 (Position 19 20) West ]
 
     it "applies actions and generates next state" $
       let step = Step [ Player 1 (Position 10 10) East, Player 2 (Position 20 20) West ]
           actions = [TurnLeft 1, TurnRight 2] in
-        tick actions step `shouldBe` Step [ Player 1 (Position 10 9) North, Player 2 (Position 20 19) North ]
+        tickStep actions step `shouldBe` Step [ Player 1 (Position 10 9) North, Player 2 (Position 20 19) North ]
 
+  describe "tickWorld" $ do
+    it "accumulates steps for second round with no actions" $
+      let world = World [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ] ] in
+        tickWorld [] world `shouldBe` World [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ]
+                                            , Step [ Player 1 (Position 10 11) South, Player 2 (Position 20 19) North ] ] 
+
+    it "accumulates steps for second round with actions" $
+      let actions = [ TurnLeft 2 ]
+          world = World [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ] ] in
+        tickWorld actions world `shouldBe` World [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ]
+                                                 , Step [ Player 1 (Position 10 11) South, Player 2 (Position 19 20) West ] ] 
