@@ -48,18 +48,17 @@ movePlayer :: Player -> Player
 movePlayer (Player pid pos d) = Player pid (move d pos) d
 
 nextStep :: Step -> Step
-nextStep (Step players) = Step $ map movePlayer players
+nextStep (Step players) = Step $ movePlayer <$> players
 
 -- changing direction
 turnPlayer :: Turn -> Player -> Player
-turnPlayer LeftTurn  (Player pid pos d) = Player pid pos (turn LeftTurn d)
-turnPlayer RightTurn (Player pid pos d) = Player pid pos (turn RightTurn d)
+turnPlayer turnDirection (Player pid pos d) = Player pid pos (turn turnDirection d)
 
 applyAction :: Action -> Player -> Player
 applyAction (Action turnDirection actionPid) p@(Player pid _ _) = if actionPid == pid then turnPlayer turnDirection p else p
 
 applyActionToStep :: Action -> Step -> Step
-applyActionToStep action (Step players) = Step $ map (applyAction action) players
+applyActionToStep action (Step players) = Step $ applyAction action <$> players
 
 applyActionsToStep :: [Action] -> Step -> Step
 applyActionsToStep actions step = foldr applyActionToStep step actions
