@@ -70,3 +70,14 @@ tickStep actions = nextStep . applyActionsToStep actions
 tickWorld :: [Action] -> World -> World
 tickWorld actions (World steps) = World $ steps ++ [ tickStep actions $ last steps ]
 
+-- player placement
+
+initializePlayers :: (Int, Int) -> Int -> Step
+initializePlayers (width, height) count =
+  Step [ Player 1 (Position (width `div` 4    ) (height `div` 6    )) East
+       , Player 2 (Position (width `div` 4 * 3) (height `div` 6    )) West
+       , Player 3 (Position (width `div` 4    ) (height `div` 6 * 3)) East
+       , Player 4 (Position (width `div` 4 * 3) (height `div` 6 * 3)) West
+       , Player 5 (Position (width `div` 4    ) (height `div` 6 * 5)) East
+       , Player 6 (Position (width `div` 4 * 3) (height `div` 6 * 5)) West
+       ]

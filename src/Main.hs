@@ -4,7 +4,15 @@ import Tron
 import System.Console.ANSI
 import System.IO
 import System.Timeout
+import System.Console.Terminal.Size
 
+data Configuration = Configuration
+  { players    :: Int
+  , gridWidth  :: Int
+  , gridHeight :: Int
+  }
+
+-- drawing
 drawPixel :: Int -> Int -> IO ()
 drawPixel x y = do
   setCursorPosition y x
@@ -32,14 +40,17 @@ gameLoop step = do
     Just _   -> gameLoop $ tickStep [] step
     Nothing  -> gameLoop $ tickStep [] step
 
--- set up terminal / screen
-handleStartup :: IO ()
+-- set up terminal / screen; returns screen dimensions
+handleStartup :: IO Configuration
 handleStartup = do
   hSetEcho      stdin  False
   hSetBuffering stdin  NoBuffering
   hSetBuffering stdout NoBuffering
   hideCursor
   setTitle "hTron"
+  window <- size
+  case window of
+    Just (Window height width) -> return (Configuration 2 width height)
 
 -- handle exit
 handleExit :: IO ()
@@ -53,9 +64,8 @@ handleExit = do
 -- main function
 main :: IO ()
 main = do
-  handleStartup
+  config <- handleStartup
   clearScreen
-  gameLoop $ Step [ Player 1 (Position 10 10) East
-                  , Player 2 (Position 20 20) West
-                  ]
+  putStr $ "Grid size: " ++ show (gridWidth config) ++ ", " ++ show (gridHeight config)
+  gameLoop $ initializePlayers (gridWidth config, gridHeight config) 6
 
