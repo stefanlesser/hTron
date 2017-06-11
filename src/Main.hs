@@ -16,7 +16,7 @@ data Configuration = Configuration
 drawPixel :: Int -> Int -> IO ()
 drawPixel x y = do
   setCursorPosition y x
-  setSGR [SetColor Background Vivid White]
+  setSGR [SetColor Background Vivid Green]
   putStr " "
 
 drawPlayer :: Player -> IO ()
@@ -34,11 +34,21 @@ gameLoop step = do
   -- process input character
   input <- timeout 100000 getChar
   case input of
-    Just 'q' -> handleExit
-    Just 'z' -> gameLoop $ tickStep [ Action LeftTurn  1 ] step
-    Just 'x' -> gameLoop $ tickStep [ Action RightTurn 1 ] step
-    Just _   -> gameLoop $ tickStep [] step
-    Nothing  -> gameLoop $ tickStep [] step
+    Just 'y'  -> handleExit
+    Just '2'  -> gameLoop $ tickStep [ Action LeftTurn  1 ] step
+    Just 'q'  -> gameLoop $ tickStep [ Action RightTurn 1 ] step
+    Just 'a'  -> gameLoop $ tickStep [ Action LeftTurn  2 ] step
+    Just 'z'  -> gameLoop $ tickStep [ Action RightTurn 2 ] step
+    Just 'c'  -> gameLoop $ tickStep [ Action LeftTurn  3 ] step
+    Just 'v'  -> gameLoop $ tickStep [ Action RightTurn 3 ] step
+    Just 'n'  -> gameLoop $ tickStep [ Action LeftTurn  4 ] step
+    Just 'm'  -> gameLoop $ tickStep [ Action RightTurn 4 ] step
+    Just '/'  -> gameLoop $ tickStep [ Action LeftTurn  5 ] step
+    Just '\'' -> gameLoop $ tickStep [ Action RightTurn 5 ] step
+    Just ']'  -> gameLoop $ tickStep [ Action LeftTurn  6 ] step
+    Just '='  -> gameLoop $ tickStep [ Action RightTurn 6 ] step
+    Just _    -> gameLoop $ tickStep [] step
+    Nothing   -> gameLoop $ tickStep [] step
 
 -- set up terminal / screen; returns screen dimensions
 handleStartup :: IO Configuration
