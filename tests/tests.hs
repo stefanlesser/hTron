@@ -113,12 +113,14 @@ main = hspec $ do
 
   describe "tickWorld" $ do
     it "accumulates steps for second round with no actions" $
-      let world = World [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ] ] in
-        tickWorld [] world `shouldBe` World [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ]
-                                            , Step [ Player 1 (Position 10 11) South, Player 2 (Position 20 19) North ] ] 
+      let config = Configuration 6 100 100
+          world = World config [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ] ] in
+        tickWorld [] world `shouldBe` World config [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ]
+                                                      , Step [ Player 1 (Position 10 11) South, Player 2 (Position 20 19) North ] ] 
 
     it "accumulates steps for second round with actions" $
-      let actions = [ Action LeftTurn 2 ]
-          world = World [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ] ] in
-        tickWorld actions world `shouldBe` World [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ]
-                                                 , Step [ Player 1 (Position 10 11) South, Player 2 (Position 19 20) West ] ] 
+      let config = Configuration 6 100 100
+          actions = [ Action LeftTurn 2 ]
+          world = World config [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ] ] in
+        tickWorld actions world `shouldBe` World config [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ]
+                                                           , Step [ Player 1 (Position 10 11) South, Player 2 (Position 19 20) West ] ] 

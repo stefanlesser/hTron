@@ -6,12 +6,6 @@ import System.IO
 import System.Timeout
 import System.Console.Terminal.Size
 
-data Configuration = Configuration
-  { players    :: Int
-  , gridWidth  :: Int
-  , gridHeight :: Int
-  }
-
 -- drawing
 drawPixel :: Int -> Int -> IO ()
 drawPixel x y = do
@@ -28,7 +22,7 @@ drawStep (Step players) = mapM_ drawPlayer players
 -- game loop
 gameLoop :: Step -> IO ()
 gameLoop step = do
-  -- some test output
+  -- rendering
   drawStep step
 
   -- process input character

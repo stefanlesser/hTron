@@ -12,16 +12,30 @@ data Turn
   | RightTurn
   deriving (Show, Eq)
 
-data Position = Position Int Int
+data Position = Position 
+  { getX :: Int
+  , getY :: Int
+  }
   deriving (Show, Eq)
 
-data Player = Player Int Position Direction
+data Player = Player 
+  { getNumber    :: Int
+  , getPosition  :: Position
+  , getDirection :: Direction
+  }
   deriving (Show, Eq)
 
 newtype Step = Step [Player]
   deriving (Show, Eq)
 
-newtype World = World [Step]
+data Configuration = Configuration
+  { getPlayers :: Int
+  , gridWidth  :: Int
+  , gridHeight :: Int
+  }
+  deriving (Show, Eq)
+
+data World = World Configuration [Step]
   deriving (Show, Eq)
 
 data Action = Action Turn Int
@@ -63,17 +77,29 @@ applyActionToStep action (Step players) = Step $ applyAction action <$> players
 applyActionsToStep :: [Action] -> Step -> Step
 applyActionsToStep actions step = foldr applyActionToStep step actions
 
+-- collision detection
+didPlayerLeaveGrid :: World -> Player -> Bool
+didPlayerLeaveGrid (World config _) player
+  | getX (getPosition player) < 0                  = True
+  | getX (getPosition player) >= gridWidth config  = True
+  | getY (getPosition player) < 0                  = True
+  | getY (getPosition player) >= gridHeight config = True
+  | otherwise                                      = False
+
+didPlayerHitWall :: World -> Player -> Bool
+didPlayerHitWall = undefined
+
 -- game logic combined
 tickStep :: [Action] -> Step -> Step
 tickStep actions = nextStep . applyActionsToStep actions
 
 tickWorld :: [Action] -> World -> World
-tickWorld actions (World steps) = World $ steps ++ [ tickStep actions $ last steps ]
+tickWorld actions (World config steps) = World config $ steps ++ [ tickStep actions $ last steps ]
 
 -- player placement
 
 initializePlayers :: (Int, Int) -> Int -> Step
-initializePlayers (width, height) count =
+initializePlayers (width, height) _ =
   Step [ Player 1 (Position (width `div` 4    ) (height `div` 6    )) East
        , Player 2 (Position (width `div` 4 * 3) (height `div` 6    )) West
        , Player 3 (Position (width `div` 4    ) (height `div` 6 * 3)) East
