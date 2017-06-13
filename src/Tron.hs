@@ -78,16 +78,19 @@ applyActionsToStep :: [Action] -> Step -> Step
 applyActionsToStep actions step = foldr applyActionToStep step actions
 
 -- collision detection
-didPlayerLeaveGrid :: World -> Player -> Bool
-didPlayerLeaveGrid (World config _) player
-  | getX (getPosition player) < 0                  = True
-  | getX (getPosition player) >= gridWidth config  = True
-  | getY (getPosition player) < 0                  = True
-  | getY (getPosition player) >= gridHeight config = True
-  | otherwise                                      = False
+isPlayerOnGrid :: (Int, Int) -> Player -> Bool
+isPlayerOnGrid (width, height) player
+  | getX (getPosition player) < 0       = False
+  | getX (getPosition player) >= width  = False
+  | getY (getPosition player) < 0       = False
+  | getY (getPosition player) >= height = False
+  | otherwise                           = True
 
-didPlayerHitWall :: World -> Player -> Bool
+didPlayerHitWall :: (Int, Int) -> Player -> Bool
 didPlayerHitWall = undefined
+
+filterOffGridPlayers :: (Int, Int) -> Step -> Step
+filterOffGridPlayers size (Step players) = Step $ filter (isPlayerOnGrid size) players
 
 -- game logic combined
 tickStep :: [Action] -> Step -> Step
@@ -97,7 +100,6 @@ tickWorld :: [Action] -> World -> World
 tickWorld actions (World config steps) = World config $ steps ++ [ tickStep actions $ last steps ]
 
 -- player placement
-
 initializePlayers :: (Int, Int) -> Int -> Step
 initializePlayers (width, height) _ =
   Step [ Player 1 (Position (width `div` 4    ) (height `div` 6    )) East

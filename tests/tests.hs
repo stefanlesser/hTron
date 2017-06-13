@@ -124,3 +124,31 @@ main = hspec $ do
           world = World config [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ] ] in
         tickWorld actions world `shouldBe` World config [ Step [ Player 1 (Position 10 10) South, Player 2 (Position 20 20) North ]
                                                            , Step [ Player 1 (Position 10 11) South, Player 2 (Position 19 20) West ] ] 
+
+  describe "isPlayerOnGrid" $ do
+    it "returns true if player is within grid bounds" $
+      let size = (10, 10)
+          player = Player 1 (Position 5 5) North in
+        isPlayerOnGrid size player `shouldBe` True
+
+    it "returns false if player is beyond grid bounds" $
+      let size = (10, 10)
+          player = Player 1 (Position 11 5) North in
+        isPlayerOnGrid size player `shouldBe` False
+
+  describe "filterOffGridPlayers" $ do
+    it "filters player leaving grid" $
+      let size = (10, 10)
+          step = Step [ Player 1 (Position 11 0) North
+                      , Player 2 (Position 5 5) West
+                      ] in
+        filterOffGridPlayers size step `shouldBe` Step [ Player 2 (Position 5 5) West ]
+
+    it "doesn't touch players still on grid" $
+      let size = (10, 10)
+          step = Step [ Player 1 (Position 2 2) North
+                      , Player 2 (Position 8 8) West
+                      ] in
+        filterOffGridPlayers size step `shouldBe` Step [ Player 1 (Position 2 2) North 
+                                                       , Player 2 (Position 8 8) West ]
+
