@@ -74,22 +74,22 @@ main = hspec $ do
       turnPlayer RightTurn (Player (PlayerId 1) (Position 10 10) South) `shouldBe` Player (PlayerId 1) (Position 10 10) West
     -- HELP: Is there a good way to test player changing direction with randomized QuickCheck?
 
-  describe "nextStepState" $ do
+  describe "movePlayersState" $ do
     it "moves both players in their directions" $ do
-      let step = Step [ Player (PlayerId 1) (Position 10 10) East, Player (PlayerId 2) (Position 20 20) West ] in
-        nextStep step `shouldBe` Step [ Player (PlayerId 1) (Position 11 10) East, Player (PlayerId 2) (Position 19 20) West ]
+      let players = [ Player (PlayerId 1) (Position 10 10) East, Player (PlayerId 2) (Position 20 20) West ] in
+        movePlayers players `shouldBe` [ Player (PlayerId 1) (Position 11 10) East, Player (PlayerId 2) (Position 19 20) West ]
 
-  describe "applyActionToStep" $ do
+  describe "applyActionToPlayers" $ do
     it "changes direction of player 1" $ do
-      let step = Step [ Player (PlayerId 1) (Position 10 10) East, Player (PlayerId 2) (Position 20 20) West ]
+      let players = [ Player (PlayerId 1) (Position 10 10) East, Player (PlayerId 2) (Position 20 20) West ]
           action = Action LeftTurn (PlayerId 1) in
-        applyActionToStep action step `shouldBe` Step [ Player (PlayerId 1) (Position 10 10) North, Player (PlayerId 2) (Position 20 20) West ] 
+        applyActionToPlayers action players `shouldBe` [ Player (PlayerId 1) (Position 10 10) North, Player (PlayerId 2) (Position 20 20) West ] 
 
-  describe "applyActionsToStep" $ do
+  describe "applyActionsToPlayers" $ do
     it "changes directions of two players" $ do
-      let step = Step [ Player (PlayerId 1) (Position 10 10) East, Player (PlayerId 2) (Position 20 20) West ]
+      let players = [ Player (PlayerId 1) (Position 10 10) East, Player (PlayerId 2) (Position 20 20) West ]
           actions = [ Action LeftTurn (PlayerId 1), Action RightTurn (PlayerId 2) ] in
-        applyActionsToStep actions step `shouldBe` Step [ Player (PlayerId 1) (Position 10 10) North, Player (PlayerId 2) (Position 20 20) North ] 
+        applyActionsToPlayers actions players `shouldBe` [ Player (PlayerId 1) (Position 10 10) North, Player (PlayerId 2) (Position 20 20) North ] 
 
   describe "applyAction" $ do
     it "doesn't affect player if player ids don't match" $

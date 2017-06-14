@@ -64,8 +64,8 @@ move South (Position x y) = Position  x      (y + 1)
 movePlayer :: Player -> Player
 movePlayer (Player pid pos d) = Player pid (move d pos) d
 
-nextStep :: Step -> Step
-nextStep (Step players) = Step $ movePlayer <$> players
+movePlayers :: [Player] -> [Player]
+movePlayers players = movePlayer <$> players
 
 -- changing direction
 turnPlayer :: Turn -> Player -> Player
@@ -76,11 +76,11 @@ applyAction (Action turnDirection actionPid) p@(Player pid _ _)
   | actionPid == pid = turnPlayer turnDirection p 
   | otherwise        = p
 
-applyActionToStep :: Action -> Step -> Step
-applyActionToStep action (Step players) = Step $ applyAction action <$> players
+applyActionToPlayers :: Action -> [Player] -> [Player]
+applyActionToPlayers action players = applyAction action <$> players
 
-applyActionsToStep :: [Action] -> Step -> Step
-applyActionsToStep actions step = foldr applyActionToStep step actions
+applyActionsToPlayers :: [Action] -> [Player] -> [Player]
+applyActionsToPlayers actions players = foldr applyActionToPlayers players actions
 
 -- collision detection
 isPlayerOnGrid :: (Int, Int) -> Player -> Bool
@@ -89,7 +89,7 @@ isPlayerOnGrid (width, height) player
   | getX (position player) >= width  = False
   | getY (position player) < 0       = False
   | getY (position player) >= height = False
-  | otherwise                           = True
+  | otherwise                        = True
 
 didPlayerHitWall :: (Int, Int) -> Player -> Bool
 didPlayerHitWall = undefined
@@ -99,7 +99,7 @@ filterOffGridPlayers size (Step players) = Step $ filter (isPlayerOnGrid size) p
 
 -- game logic combined
 tickStep :: [Action] -> Step -> Step
-tickStep actions = nextStep . applyActionsToStep actions
+tickStep actions (Step players) = Step $ (movePlayers . applyActionsToPlayers actions) players
 
 tickWorld :: [Action] -> World -> World
 tickWorld actions (World config steps) = World config $ steps ++ [ tickStep actions $ last steps ]
