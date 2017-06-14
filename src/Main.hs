@@ -36,14 +36,16 @@ processInput (Just '=')  = [Action RightTurn (PlayerId 6)]
 processInput _           = []
 
 gameLoop :: Configuration -> Step -> IO ()
-gameLoop config step = do
+gameLoop config step@(Step players) 
+  | length players <= 1 = handleExit "Game over."
+  | otherwise = do
   -- rendering
   drawStep step
 
   -- process input character
   input <- timeout 100000 getChar
   case input of 
-    Just 'y' -> handleExit
+    Just 'y' -> handleExit "Early exit. Bye bye."
     _        -> gameLoop config newStep
                   where newStep = filterOffGridPlayers (gridWidth config, gridHeight config) 
                                 $ tickStep (processInput input) step
@@ -61,13 +63,13 @@ handleStartup = do
     Just (Window height width) -> return (Configuration 2 width height)
 
 -- handle exit
-handleExit :: IO ()
-handleExit = do
+handleExit :: String -> IO ()
+handleExit text = do
   setSGR [Reset]
   clearScreen
   setCursorPosition 0 0
   showCursor
-  putStrLn "Thank you for playing!"
+  putStrLn text
 
 -- main function
 main :: IO ()
