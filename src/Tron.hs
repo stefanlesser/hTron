@@ -18,10 +18,13 @@ data Position = Position
   }
   deriving (Show, Eq)
 
+newtype PlayerId = PlayerId Int
+  deriving (Eq, Show)
+
 data Player = Player 
-  { getNumber    :: Int
-  , getPosition  :: Position
-  , getDirection :: Direction
+  { playerId  :: PlayerId
+  , position  :: Position
+  , direction :: Direction
   }
   deriving (Show, Eq)
 
@@ -29,7 +32,7 @@ newtype Step = Step [Player]
   deriving (Show, Eq)
 
 data Configuration = Configuration
-  { getPlayers :: Int
+  { numPlayers :: Int
   , gridWidth  :: Int
   , gridHeight :: Int
   }
@@ -38,7 +41,7 @@ data Configuration = Configuration
 data World = World Configuration [Step]
   deriving (Show, Eq)
 
-data Action = Action Turn Int
+data Action = Action Turn PlayerId
   deriving (Show, Eq)
 
 turn :: Turn -> Direction -> Direction
@@ -69,7 +72,9 @@ turnPlayer :: Turn -> Player -> Player
 turnPlayer turnDirection (Player pid pos d) = Player pid pos (turn turnDirection d)
 
 applyAction :: Action -> Player -> Player
-applyAction (Action turnDirection actionPid) p@(Player pid _ _) = if actionPid == pid then turnPlayer turnDirection p else p
+applyAction (Action turnDirection actionPid) p@(Player pid _ _) 
+  | actionPid == pid = turnPlayer turnDirection p 
+  | otherwise        = p
 
 applyActionToStep :: Action -> Step -> Step
 applyActionToStep action (Step players) = Step $ applyAction action <$> players
@@ -80,10 +85,10 @@ applyActionsToStep actions step = foldr applyActionToStep step actions
 -- collision detection
 isPlayerOnGrid :: (Int, Int) -> Player -> Bool
 isPlayerOnGrid (width, height) player
-  | getX (getPosition player) < 0       = False
-  | getX (getPosition player) >= width  = False
-  | getY (getPosition player) < 0       = False
-  | getY (getPosition player) >= height = False
+  | getX (position player) < 0       = False
+  | getX (position player) >= width  = False
+  | getY (position player) < 0       = False
+  | getY (position player) >= height = False
   | otherwise                           = True
 
 didPlayerHitWall :: (Int, Int) -> Player -> Bool
@@ -102,10 +107,10 @@ tickWorld actions (World config steps) = World config $ steps ++ [ tickStep acti
 -- player placement
 initializePlayers :: (Int, Int) -> Int -> Step
 initializePlayers (width, height) _ =
-  Step [ Player 1 (Position (width `div` 4    ) (height `div` 6    )) East
-       , Player 2 (Position (width `div` 4 * 3) (height `div` 6    )) West
-       , Player 3 (Position (width `div` 4    ) (height `div` 6 * 3)) East
-       , Player 4 (Position (width `div` 4 * 3) (height `div` 6 * 3)) West
-       , Player 5 (Position (width `div` 4    ) (height `div` 6 * 5)) East
-       , Player 6 (Position (width `div` 4 * 3) (height `div` 6 * 5)) West
+  Step [ Player (PlayerId 1) (Position (width `div` 4    ) (height `div` 6    )) East
+       , Player (PlayerId 2) (Position (width `div` 4 * 3) (height `div` 6    )) West
+       , Player (PlayerId 3) (Position (width `div` 4    ) (height `div` 6 * 3)) East
+       , Player (PlayerId 4) (Position (width `div` 4 * 3) (height `div` 6 * 3)) West
+       , Player (PlayerId 5) (Position (width `div` 4    ) (height `div` 6 * 5)) East
+       , Player (PlayerId 6) (Position (width `div` 4 * 3) (height `div` 6 * 5)) West
        ]
