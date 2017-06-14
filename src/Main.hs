@@ -20,6 +20,21 @@ drawStep :: Step -> IO ()
 drawStep (Step players) = mapM_ drawPlayer players 
 
 -- game loop
+processInput :: Maybe Char -> [Action]
+processInput (Just '2')  = [Action LeftTurn  (PlayerId 1)]
+processInput (Just 'q')  = [Action RightTurn (PlayerId 1)]
+processInput (Just 'a')  = [Action LeftTurn  (PlayerId 2)]
+processInput (Just 'z')  = [Action RightTurn (PlayerId 2)]
+processInput (Just 'c')  = [Action LeftTurn  (PlayerId 3)]
+processInput (Just 'v')  = [Action RightTurn (PlayerId 3)]
+processInput (Just 'n')  = [Action LeftTurn  (PlayerId 4)]
+processInput (Just 'm')  = [Action RightTurn (PlayerId 4)]
+processInput (Just '/')  = [Action LeftTurn  (PlayerId 5)]
+processInput (Just '\'') = [Action RightTurn (PlayerId 5)]
+processInput (Just ']')  = [Action LeftTurn  (PlayerId 6)]
+processInput (Just '=')  = [Action RightTurn (PlayerId 6)]
+processInput _           = []
+
 gameLoop :: Configuration -> Step -> IO ()
 gameLoop config step = do
   -- rendering
@@ -27,26 +42,11 @@ gameLoop config step = do
 
   -- process input character
   input <- timeout 100000 getChar
-  case input of
-    Just 'y'  -> handleExit
-    Just '2'  -> continueWithActions [Action LeftTurn  (PlayerId 1)]
-    Just 'q'  -> continueWithActions [Action RightTurn (PlayerId 1)]
-    Just 'a'  -> continueWithActions [Action LeftTurn  (PlayerId 2)]
-    Just 'z'  -> continueWithActions [Action RightTurn (PlayerId 2)]
-    Just 'c'  -> continueWithActions [Action LeftTurn  (PlayerId 3)]
-    Just 'v'  -> continueWithActions [Action RightTurn (PlayerId 3)]
-    Just 'n'  -> continueWithActions [Action LeftTurn  (PlayerId 4)]
-    Just 'm'  -> continueWithActions [Action RightTurn (PlayerId 4)]
-    Just '/'  -> continueWithActions [Action LeftTurn  (PlayerId 5)]
-    Just '\'' -> continueWithActions [Action RightTurn (PlayerId 5)]
-    Just ']'  -> continueWithActions [Action LeftTurn  (PlayerId 6)]
-    Just '='  -> continueWithActions [Action RightTurn (PlayerId 6)]
-    Just _    -> continueWithActions []
-    Nothing   -> continueWithActions []
-  where
-    continueWithActions a = gameLoop config 
-                          $ filterOffGridPlayers (gridWidth config, gridHeight config) 
-                          $ tickStep a step
+  case input of 
+    Just 'y' -> handleExit
+    _        -> gameLoop config newStep
+                  where newStep = filterOffGridPlayers (gridWidth config, gridHeight config) 
+                                $ tickStep (processInput input) step
 
 -- set up terminal / screen; returns screen dimensions
 handleStartup :: IO Configuration
