@@ -29,20 +29,24 @@ gameLoop config step = do
   input <- timeout 100000 getChar
   case input of
     Just 'y'  -> handleExit
-    Just '2'  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action LeftTurn  1 ] step
-    Just 'q'  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action RightTurn 1 ] step
-    Just 'a'  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action LeftTurn  2 ] step
-    Just 'z'  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action RightTurn 2 ] step
-    Just 'c'  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action LeftTurn  3 ] step
-    Just 'v'  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action RightTurn 3 ] step
-    Just 'n'  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action LeftTurn  4 ] step
-    Just 'm'  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action RightTurn 4 ] step
-    Just '/'  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action LeftTurn  5 ] step
-    Just '\'' -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action RightTurn 5 ] step
-    Just ']'  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action LeftTurn  6 ] step
-    Just '='  -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [ Action RightTurn 6 ] step
-    Just _    -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [] step
-    Nothing   -> gameLoop config $ filterOffGridPlayers (gridWidth config, gridHeight config) $ tickStep [] step
+    Just '2'  -> continueWithActions [Action LeftTurn  1]
+    Just 'q'  -> continueWithActions [Action RightTurn 1]
+    Just 'a'  -> continueWithActions [Action LeftTurn  2]
+    Just 'z'  -> continueWithActions [Action RightTurn 2]
+    Just 'c'  -> continueWithActions [Action LeftTurn  3]
+    Just 'v'  -> continueWithActions [Action RightTurn 3]
+    Just 'n'  -> continueWithActions [Action LeftTurn  4]
+    Just 'm'  -> continueWithActions [Action RightTurn 4]
+    Just '/'  -> continueWithActions [Action LeftTurn  5]
+    Just '\'' -> continueWithActions [Action RightTurn 5]
+    Just ']'  -> continueWithActions [Action LeftTurn  6]
+    Just '='  -> continueWithActions [Action RightTurn 6]
+    Just _    -> continueWithActions []
+    Nothing   -> continueWithActions []
+  where
+    continueWithActions a = gameLoop config 
+                          $ filterOffGridPlayers (gridWidth config, gridHeight config) 
+                          $ tickStep a step
 
 -- set up terminal / screen; returns screen dimensions
 handleStartup :: IO Configuration
