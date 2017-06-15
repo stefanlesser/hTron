@@ -28,8 +28,7 @@ data Player = Player
   }
   deriving (Show, Eq)
 
-newtype Step = Step [Player]
-  deriving (Show, Eq)
+type Step = [Player]
 
 data Configuration = Configuration
   { numPlayers :: Int
@@ -65,7 +64,7 @@ movePlayer :: Player -> Player
 movePlayer (Player pid pos d) = Player pid (move d pos) d
 
 movePlayers :: [Player] -> [Player]
-movePlayers players = movePlayer <$> players
+movePlayers = fmap movePlayer 
 
 -- changing direction
 turnPlayer :: Turn -> Player -> Player
@@ -77,7 +76,7 @@ applyAction (Action turnDirection actionPid) p@(Player pid _ _)
   | otherwise        = p
 
 applyActionToPlayers :: Action -> [Player] -> [Player]
-applyActionToPlayers action players = applyAction action <$> players
+applyActionToPlayers = fmap . applyAction
 
 applyActionsToPlayers :: [Action] -> [Player] -> [Player]
 applyActionsToPlayers actions players = foldr applyActionToPlayers players actions
@@ -94,12 +93,12 @@ isPlayerOnGrid (width, height) player
 didPlayerHitWall :: (Int, Int) -> Player -> Bool
 didPlayerHitWall = undefined
 
-filterOffGridPlayers :: (Int, Int) -> Step -> Step
-filterOffGridPlayers size (Step players) = Step $ filter (isPlayerOnGrid size) players
+filterOffGridPlayers :: (Int, Int) -> [Player] -> [Player]
+filterOffGridPlayers = filter . isPlayerOnGrid
 
 -- game logic combined
-tickStep :: [Action] -> Step -> Step
-tickStep actions (Step players) = Step $ (movePlayers . applyActionsToPlayers actions) players
+tickStep :: [Action] -> [Player] -> [Player]
+tickStep actions = movePlayers . applyActionsToPlayers actions
 
 tickWorld :: [Action] -> World -> World
 tickWorld actions (World config steps) = World config $ steps ++ [ tickStep actions $ last steps ]
@@ -107,10 +106,10 @@ tickWorld actions (World config steps) = World config $ steps ++ [ tickStep acti
 -- player placement
 initializePlayers :: (Int, Int) -> Int -> Step
 initializePlayers (width, height) _ =
-  Step [ Player (PlayerId 1) (Position (width `div` 4    ) (height `div` 6    )) East
-       , Player (PlayerId 2) (Position (width `div` 4 * 3) (height `div` 6    )) West
-       , Player (PlayerId 3) (Position (width `div` 4    ) (height `div` 6 * 3)) East
-       , Player (PlayerId 4) (Position (width `div` 4 * 3) (height `div` 6 * 3)) West
-       , Player (PlayerId 5) (Position (width `div` 4    ) (height `div` 6 * 5)) East
-       , Player (PlayerId 6) (Position (width `div` 4 * 3) (height `div` 6 * 5)) West
-       ]
+  [ Player (PlayerId 1) (Position (width `div` 4    ) (height `div` 6    )) East
+  , Player (PlayerId 2) (Position (width `div` 4 * 3) (height `div` 6    )) West
+  , Player (PlayerId 3) (Position (width `div` 4    ) (height `div` 6 * 3)) East
+  , Player (PlayerId 4) (Position (width `div` 4 * 3) (height `div` 6 * 3)) West
+  , Player (PlayerId 5) (Position (width `div` 4    ) (height `div` 6 * 5)) East
+  , Player (PlayerId 6) (Position (width `div` 4 * 3) (height `div` 6 * 5)) West
+  ]

@@ -102,28 +102,28 @@ main = hspec $ do
 
   describe "tickStep" $ do
     it "generates next state without any actions" $
-      let step = Step [ Player (PlayerId 1) (Position 10 10) East, Player (PlayerId 2) (Position 20 20) West ] 
+      let step = [ Player (PlayerId 1) (Position 10 10) East, Player (PlayerId 2) (Position 20 20) West ] 
           actions = [] in
-        tickStep actions step `shouldBe` Step [ Player (PlayerId 1) (Position 11 10) East, Player (PlayerId 2) (Position 19 20) West ]
+        tickStep actions step `shouldBe` [ Player (PlayerId 1) (Position 11 10) East, Player (PlayerId 2) (Position 19 20) West ]
 
     it "applies actions and generates next state" $
-      let step = Step [ Player (PlayerId 1) (Position 10 10) East, Player (PlayerId 2) (Position 20 20) West ]
+      let step = [ Player (PlayerId 1) (Position 10 10) East, Player (PlayerId 2) (Position 20 20) West ]
           actions = [Action LeftTurn (PlayerId 1), Action RightTurn (PlayerId 2)] in
-        tickStep actions step `shouldBe` Step [ Player (PlayerId 1) (Position 10 9) North, Player (PlayerId 2) (Position 20 19) North ]
+        tickStep actions step `shouldBe` [ Player (PlayerId 1) (Position 10 9) North, Player (PlayerId 2) (Position 20 19) North ]
 
   describe "tickWorld" $ do
     it "accumulates steps for second round with no actions" $
       let config = Configuration 6 100 100
-          world = World config [ Step [ Player (PlayerId 1) (Position 10 10) South, Player (PlayerId 2) (Position 20 20) North ] ] in
-        tickWorld [] world `shouldBe` World config [ Step [ Player (PlayerId 1) (Position 10 10) South, Player (PlayerId 2) (Position 20 20) North ]
-                                                      , Step [ Player (PlayerId 1) (Position 10 11) South, Player (PlayerId 2) (Position 20 19) North ] ] 
+          world = World config [ [ Player (PlayerId 1) (Position 10 10) South, Player (PlayerId 2) (Position 20 20) North ] ] in
+        tickWorld [] world `shouldBe` World config [ [ Player (PlayerId 1) (Position 10 10) South, Player (PlayerId 2) (Position 20 20) North ]
+                                                      , [ Player (PlayerId 1) (Position 10 11) South, Player (PlayerId 2) (Position 20 19) North ] ] 
 
     it "accumulates steps for second round with actions" $
       let config = Configuration 6 100 100
           actions = [ Action LeftTurn (PlayerId 2) ]
-          world = World config [ Step [ Player (PlayerId 1) (Position 10 10) South, Player (PlayerId 2) (Position 20 20) North ] ] in
-        tickWorld actions world `shouldBe` World config [ Step [ Player (PlayerId 1) (Position 10 10) South, Player (PlayerId 2) (Position 20 20) North ]
-                                                           , Step [ Player (PlayerId 1) (Position 10 11) South, Player (PlayerId 2) (Position 19 20) West ] ] 
+          world = World config [ [ Player (PlayerId 1) (Position 10 10) South, Player (PlayerId 2) (Position 20 20) North ] ] in
+        tickWorld actions world `shouldBe` World config [ [ Player (PlayerId 1) (Position 10 10) South, Player (PlayerId 2) (Position 20 20) North ]
+                                                           , [ Player (PlayerId 1) (Position 10 11) South, Player (PlayerId 2) (Position 19 20) West ] ] 
 
   describe "isPlayerOnGrid" $ do
     it "returns true if player is within grid bounds" $
@@ -139,16 +139,16 @@ main = hspec $ do
   describe "filterOffGridPlayers" $ do
     it "filters player leaving grid" $
       let size = (10, 10)
-          step = Step [ Player (PlayerId 1) (Position 11 0) North
+          step = [ Player (PlayerId 1) (Position 11 0) North
                       , Player (PlayerId 2) (Position 5 5) West
                       ] in
-        filterOffGridPlayers size step `shouldBe` Step [ Player (PlayerId 2) (Position 5 5) West ]
+        filterOffGridPlayers size step `shouldBe` [ Player (PlayerId 2) (Position 5 5) West ]
 
     it "doesn't touch players still on grid" $
       let size = (10, 10)
-          step = Step [ Player (PlayerId 1) (Position 2 2) North
+          step = [ Player (PlayerId 1) (Position 2 2) North
                       , Player (PlayerId 2) (Position 8 8) West
                       ] in
-        filterOffGridPlayers size step `shouldBe` Step [ Player (PlayerId 1) (Position 2 2) North 
+        filterOffGridPlayers size step `shouldBe` [ Player (PlayerId 1) (Position 2 2) North 
                                                        , Player (PlayerId 2) (Position 8 8) West ]
 

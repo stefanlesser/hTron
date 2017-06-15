@@ -17,7 +17,7 @@ drawPlayer :: Player -> IO ()
 drawPlayer (Player _ (Position x y) _) = drawPixel x y
 
 drawStep :: Step -> IO ()
-drawStep (Step players) = mapM_ drawPlayer players 
+drawStep = mapM_ drawPlayer
 
 -- game loop
 processInput :: Maybe Char -> [Action]
@@ -36,11 +36,11 @@ processInput (Just '=')  = [Action RightTurn (PlayerId 6)]
 processInput _           = []
 
 gameLoop :: Configuration -> Step -> IO ()
-gameLoop config step@(Step players) 
+gameLoop config players 
   | length players <= 1 = handleExit "Game over."
   | otherwise = do
   -- rendering
-  drawStep step
+  drawStep players
 
   -- process input character
   input <- timeout 100000 getChar
@@ -48,8 +48,8 @@ gameLoop config step@(Step players)
     Just 'y' -> handleExit "Early exit. Bye bye."
     _        -> gameLoop config newStep
                   where newStep = filterOffGridPlayers (gridWidth config, gridHeight config) 
-                                $ tickStep (processInput input) step
-
+                                $ tickStep (processInput input) players
+ 
 -- set up terminal / screen; returns screen dimensions
 handleStartup :: IO Configuration
 handleStartup = do
