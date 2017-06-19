@@ -1,5 +1,7 @@
 module Tron where
 
+import Control.Monad.State
+
 data Direction
   = North
   | South
@@ -12,7 +14,7 @@ data Turn
   | RightTurn
   deriving (Show, Eq)
 
-data Position = Position 
+data Position = Position
   { getX :: Int
   , getY :: Int
   }
@@ -21,7 +23,7 @@ data Position = Position
 newtype PlayerId = PlayerId Int
   deriving (Eq, Show)
 
-data Player = Player 
+data Player = Player
   { playerId  :: PlayerId
   , position  :: Position
   , direction :: Direction
@@ -37,7 +39,10 @@ data Configuration = Configuration
   }
   deriving (Show, Eq)
 
-data World = World Configuration [Step]
+data World = World
+  { config :: Configuration
+  , steps  :: [Step]
+  }
   deriving (Show, Eq)
 
 data Action = Action Turn PlayerId
@@ -64,15 +69,15 @@ movePlayer :: Player -> Player
 movePlayer (Player pid pos d) = Player pid (move d pos) d
 
 movePlayers :: [Player] -> [Player]
-movePlayers = fmap movePlayer 
+movePlayers = fmap movePlayer
 
 -- changing direction
 turnPlayer :: Turn -> Player -> Player
 turnPlayer turnDirection (Player pid pos d) = Player pid pos (turn turnDirection d)
 
 applyAction :: Action -> Player -> Player
-applyAction (Action turnDirection actionPid) p@(Player pid _ _) 
-  | actionPid == pid = turnPlayer turnDirection p 
+applyAction (Action turnDirection actionPid) p@(Player pid _ _)
+  | actionPid == pid = turnPlayer turnDirection p
   | otherwise        = p
 
 applyActionToPlayers :: Action -> [Player] -> [Player]

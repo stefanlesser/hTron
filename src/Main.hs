@@ -5,6 +5,7 @@ import System.Console.ANSI
 import System.IO
 import System.Timeout
 import System.Console.Terminal.Size
+import Control.Monad.State.Lazy
 
 -- drawing
 drawPixel :: Int -> Int -> IO ()
@@ -35,21 +36,27 @@ processInput (Just ']')  = [Action LeftTurn  (PlayerId 6)]
 processInput (Just '=')  = [Action RightTurn (PlayerId 6)]
 processInput _           = []
 
-gameLoop :: Configuration -> Step -> IO ()
-gameLoop config players 
-  | length players <= 1 = handleExit "Game over."
-  | otherwise = do
-  -- rendering
-  drawStep players
+gameLoop :: StateT World IO ()
+gameLoop = do
+  width   <- gridWidth <$> gets config
+  height  <- gridHeight <$> gets config
+  players <- last <$> gets steps
 
-  -- process input character
-  input <- timeout 100000 getChar
-  case input of 
-    Just 'y' -> handleExit "Early exit. Bye bye."
-    _        -> gameLoop config newStep
-                  where newStep = filterOffGridPlayers (gridWidth config, gridHeight config) 
-                                $ tickStep (processInput input) players
- 
+  if length players <= 1
+  then liftIO $ handleExit "Game over."
+  else do
+    -- rendering
+    liftIO $ drawStep players
+
+    -- process input character
+    input <- liftIO $ timeout 100000 getChar
+    case input of
+      Just 'y' -> liftIO $ handleExit "Early exit. Bye bye."
+      _        -> do
+        let newStep = filterOffGridPlayers (width, height) $ tickStep (processInput input) players
+        modify $ \w -> w { steps = steps w ++ [newStep] }
+        gameLoop
+
 -- set up terminal / screen; returns screen dimensions
 handleStartup :: IO Configuration
 handleStartup = do
@@ -77,5 +84,5 @@ main = do
   config <- handleStartup
   clearScreen
   putStr $ "Grid size: " ++ show (gridWidth config) ++ ", " ++ show (gridHeight config)
-  gameLoop config $ initializePlayers (gridWidth config, gridHeight config) 6
-
+  let step = initializePlayers (gridWidth config, gridHeight config) 6
+  evalStateT gameLoop $ World config [step]
